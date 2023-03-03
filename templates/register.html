@@ -59,27 +59,27 @@
         {% endfor %}
     </div>
     <div class="forms">
-        {{ form.pos.label }}<br>
-        {{ form.pos(class="form-control") }}<br>
-        {% for error in form.pos.errors %}
+        {{ form.position.label }}<br>
+        {{ form.position(class="form-control") }}<br>
+        {% for error in form.position.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
             </p>
         {% endfor %}
     </div>
     <div class="forms">
-        {{ form.spec.label }}<br>
-        {{ form.spec(class="form-control") }}<br>
-        {% for error in form.spec.errors %}
+        {{ form.speciality.label }}<br>
+        {{ form.speciality(class="form-control") }}<br>
+        {% for error in form.speciality.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
             </p>
         {% endfor %}
     </div>
     <div class="forms">
-        {{ form.adrs.label }}<br>
-        {{ form.adrs(class="form-control") }}<br>
-        {% for error in form.adrs.errors %}
+        {{ form.address.label }}<br>
+        {{ form.address(class="form-control") }}<br>
+        {% for error in form.address.errors %}
             <p class="alert alert-danger" role="alert">
                 {{ error }}
             </p>
