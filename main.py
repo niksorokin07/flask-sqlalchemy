@@ -162,7 +162,6 @@ def all_jobs():
     for el in res:
         title = el.job
         time = el.end_date - el.start_date
-        print(el, "-", time)
         team_leader = f"{el.user.name} {el.user.surname}"
         collaborators = el.collaborators
         isf = el.is_finished
