@@ -1,11 +1,11 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, Blueprint, jsonify, make_response
 import datetime
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, BooleanField, SubmitField, EmailField, StringField, IntegerField
 from wtforms import SelectMultipleField, DateTimeField, SelectField
 from wtforms.validators import DataRequired
-from data import db_session
+from data import db_session, news_api, jobs_api
 from data.db_session import SqlAlchemyBase
 from data.users import User
 from data.jobs import Jobs
@@ -20,8 +20,15 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+blueprint = Blueprint(
+    'news_api',
+    __name__,
+    template_folder='templates'
+)
+
 db_session.global_init("db/blogs.db")
 dbs = db_session.create_session()
+
 dbs.commit()
 
 
@@ -233,6 +240,18 @@ def delete_job(id):
     return redirect('/alljobs')
 
 
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
+
+
 if __name__ == '__main__':
     db_session.global_init("db/blogs.db")
+    app.register_blueprint(news_api.blueprint)
+    app.register_blueprint(jobs_api.blueprint)
     app.run(port=8080, host='127.0.0.1')
