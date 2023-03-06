@@ -1,7 +1,8 @@
 import flask
-from flask import jsonify
+from flask import jsonify, request
 from data import db_session
 from data.jobs import Jobs
+from data.hazard_levels import HazardLevel
 
 blueprint = flask.Blueprint(
     'jobs_api',
@@ -27,8 +28,37 @@ def get_news():
 def get_one_job(job_id):
     db_sess = db_session.create_session()
     jobs = db_sess.query(Jobs).get(job_id)
+    if not jobs:
+        return jsonify({'error': 'Not found'})
     return jsonify(
         {
             'jobs': jobs.to_dict(only=('job', 'user.name'))
         }
     )
+
+
+@blueprint.route('/api/jobs', methods=['POST'])
+def create_news():
+    if not request.json:
+        return jsonify({'error': 'Empty request'})
+    elif not all(key in request.json for key in
+                 ['team_leader', 'job', 'work_size', 'hazard_level', 'collaborators',
+                  'start_date', 'end_date', 'is_finished']):
+        return jsonify({'error': 'Bad request'})
+    print(111)
+    db_sess = db_session.create_session()
+    job = Jobs()
+    r = request.json
+    job.job = r["job"]
+    job.team_leader = r["team_leader"]
+    job.collaborators = r["collaborators"]
+    job.is_finished = r["is_finished"]
+    job.start_date = r["start_date"]
+    job.end_date = r["end_date"]
+    job.work_size = r["work_size"]
+    hazard = HazardLevel()
+    hazard.level = r["hazard_level"]
+    job.hazard_level.append(hazard)
+    db_sess.add(job)
+    db_sess.commit()
+    return jsonify({'success': 'OK'})
