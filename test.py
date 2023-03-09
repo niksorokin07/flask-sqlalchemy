@@ -1,4 +1,4 @@
-from requests import get, exceptions, post, delete
+from requests import get, exceptions, post, delete, put
 
 """try:
     print(get('http://localhost:8080/api/jobs').json())
@@ -27,7 +27,7 @@ try:
                      "is_finished": False}).json())
     # Success
     print(post('http://localhost:8080/api/jobs',
-               json={"id": 6, "team_leader": "test-run@mars.org", "job": "test-run",
+               json={"id": 2, "team_leader": "test-run@mars.org", "job": "test-run",
                      "work_size": 16, "hazard_level": 2, "collaborators": None, "start_date": None, "end_date": None,
                      "is_finished": False}).json())
 except exceptions.ConnectionError:
@@ -42,3 +42,20 @@ try:
     print(delete('http://127.0.0.1:8080/api/jobs/3').json())
 except exceptions.ConnectionError:
     print("Connections 9-11 refused")"""
+"""
+try:
+    # Bad request
+    print(put('http://localhost:8080/api/jobs/1',
+              json={"team_leader": "test-run@mars.org"}).json())
+    # Id doesn't exist
+    print(put('http://localhost:8080/api/jobs/99',
+              json={"team_leader": "test-run@mars.org", "job": "test-run",
+                    "work_size": 16, "hazard_level": 2, "collaborators": None, "start_date": None, "end_date": None,
+                    "is_finished": False}).json())
+    # Success
+    print(put('http://localhost:8080/api/jobs/6',
+              json={"team_leader": "test-run@mars.org", "job": "test-run",
+                    "work_size": 16, "hazard_level": 2, "collaborators": None, "start_date": None, "end_date": None,
+                    "is_finished": False}).json())
+except exceptions.ConnectionError:
+    print("Connections 12-14 refused")"""
