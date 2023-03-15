@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, Blueprint, jsonify, make_response
+from flask import Flask, render_template, redirect, request, Blueprint, jsonify, make_response, abort
 import datetime
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
 from flask_wtf import FlaskForm
@@ -11,9 +11,12 @@ from data.users import User
 from data.jobs import Jobs
 from data.news import News
 from data.hazard_levels import HazardLevel
+from data.user_resource import UsersResource, UsersListResource
 import sqlalchemy
+from flask_restful import Api
 
 app = Flask(__name__)
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=365)
 
@@ -240,9 +243,11 @@ def delete_job(id):
     return redirect('/alljobs')
 
 
-@app.errorhandler(404)
-def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+def abort_if_news_not_found(news_id):
+    session = db_session.create_session()
+    news = session.query(News).get(news_id)
+    if not news:
+        abort(404, message=f"News {news_id} not found")
 
 
 @app.errorhandler(400)
@@ -254,4 +259,6 @@ if __name__ == '__main__':
     db_session.global_init("db/blogs.db")
     app.register_blueprint(news_api.blueprint)
     app.register_blueprint(jobs_api.blueprint)
+    api.add_resource(UsersListResource, '/api/v2/users')
+    api.add_resource(UsersResource, '/api/v2/users/<int:user_id>')
     app.run(port=8080, host='127.0.0.1')
