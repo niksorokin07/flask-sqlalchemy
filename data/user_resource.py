@@ -55,7 +55,7 @@ class UsersResource(Resource):
         db_sess = db_session.create_session()
         if args['id'] and db_sess.query(User).filter(User.id == user_id).first():
             return jsonify({'error': 'Id already exists'})
-        user = db_sess.query(User).filter(User.id == user_id).first()
+        user = User()
         user.surname = args['surname'],
         user.name = args['name'],
         user.age = args['age'],
