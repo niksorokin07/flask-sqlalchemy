@@ -3,6 +3,7 @@ from data import db_session
 from flask_restful import abort, reqparse, Resource
 from flask import jsonify
 import datetime
+from werkzeug.security import generate_password_hash
 
 
 def abort_if_user_not_found(user_id):
@@ -13,7 +14,6 @@ def abort_if_user_not_found(user_id):
 
 
 parser = reqparse.RequestParser()
-parser.add_argument('id', required=False, type=int)
 parser.add_argument('surname', required=True, type=str)
 parser.add_argument('name', required=True, type=str)
 parser.add_argument('age', required=True, type=int)
@@ -33,7 +33,8 @@ class UsersResource(Resource):
         if not data:
             return jsonify({'error': 'Not found'})
         return jsonify({
-            'user': data.to_dict()
+            'user': data.to_dict(
+                only=('email', 'password_hash', 'surname', 'name', 'age', 'position', 'speciality', 'address'))
         })
 
     def delete(self, user_id):
@@ -53,7 +54,7 @@ class UsersResource(Resource):
                                 'password_hash', 'modified_date', ]):
             return jsonify({'error': 'Bad request'})
         db_sess = db_session.create_session()
-        if args['id'] and db_sess.query(User).filter(User.id == user_id).first():
+        if db_sess.query(User).filter(User.id == user_id).first():
             return jsonify({'error': 'Id already exists'})
         user = User()
         user.surname = args['surname'],
@@ -63,7 +64,7 @@ class UsersResource(Resource):
         user.speciality = args['speciality'],
         user.address = args['address'],
         user.email = args['email'],
-        user.password_hash = args['password_hash'],
+        user.password_hash = generate_password_hash(args['password_hash']),
         user.modified_date = args['modified_date'],
         db_sess.commit()
         return jsonify({'success': 'OK'})
@@ -78,16 +79,11 @@ class UsersListResource(Resource):
     def post(self):
         args = parser.parse_args()
         if not args or not all(key in args for key in
-                               ['id', 'address', 'age', 'email', 'modified_date', 'name', 'position', 'surname',
+                               ['address', 'age', 'email', 'modified_date', 'name', 'position', 'surname',
                                 'speciality', 'password_hash']):
             return jsonify({'error': 'Bad request'})
         db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.id == args['id']).first():
-            return jsonify({'error': ' Id already exists'})
-        if db_sess.query(User).filter(User.email == args['email']).first():
-            return jsonify({'error': 'Email already exists'})
         user = User(
-            id=args['id'],
             surname=args['surname'],
             name=args['name'],
             age=args['age'],
@@ -95,7 +91,7 @@ class UsersListResource(Resource):
             speciality=args['speciality'],
             address=args['address'],
             email=args['email'],
-            password_hash=args['password_hash'],
+            password_hash=generate_password_hash(args['password_hash']),
             modified_date=args['modified_date'],
         )
         db_sess.add(user)
