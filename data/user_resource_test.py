@@ -2,7 +2,7 @@ from requests import get, post, delete, put
 import datetime
 
 print(get('http://127.0.0.1:8080/api/v2/users').json())
-print(post('http://127.0.0.1:8080/api/v2/users', json={'id': 4, 'email': 'test1@mars.org',
+print(post('http://127.0.0.1:8080/api/v2/users', json={'email': 'test1@mars.org',
                                                        'surname': 'komarov', 'name': 'ivan', 'age': 22,
                                                        'position': '2', 'speciality': 'microbiologist',
                                                        'address': 'Novatorov 22A',

@@ -1,9 +1,9 @@
 from data.users import User
 from data import db_session
-from flask_restful import abort, reqparse, Resource
+from flask_restful import abort, Resource
 from flask import jsonify
-import datetime
 from werkzeug.security import generate_password_hash
+from data.user_resource_parser import parser
 
 
 def abort_if_user_not_found(user_id):
@@ -11,18 +11,6 @@ def abort_if_user_not_found(user_id):
     news = session.query(User).get(user_id)
     if not news:
         abort(404, message=f"News {user_id} not found")
-
-
-parser = reqparse.RequestParser()
-parser.add_argument('surname', required=True, type=str)
-parser.add_argument('name', required=True, type=str)
-parser.add_argument('age', required=True, type=int)
-parser.add_argument('position', required=True, type=str)
-parser.add_argument('speciality', required=True, type=str)
-parser.add_argument('address', required=True, type=str)
-parser.add_argument('email', required=True, type=str)
-parser.add_argument('password_hash', required=True, type=str)
-parser.add_argument('modified_date', required=True, default=datetime.datetime.now())
 
 
 class UsersResource(Resource):
